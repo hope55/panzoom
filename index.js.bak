@@ -182,18 +182,18 @@ function createPanZoom(domElement, options) {
   }
 
   function transformToParent(x, y) {
-    if (panController.getCTM) {
-      var parentCTM = panController.getCTM()
+    //if (panController.getCTM) {
+      var parentCTM = panController.getOwner().getCTM()
       var parentScaleX = parentCTM.a
       var parentScaleY = parentCTM.d
       var parentOffsetX = parentCTM.e
       var parentOffsetY = parentCTM.f
       storedCTMResult.x = x * parentScaleX - parentOffsetX
       storedCTMResult.y = y * parentScaleY - parentOffsetY
-    } else {
-      storedCTMResult.x = x
-      storedCTMResult.y = y
-    }
+    //} else {
+    //  storedCTMResult.x = x
+    //  storedCTMResult.y = y
+    //}
 
     return storedCTMResult
   }
