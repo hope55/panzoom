@@ -419,8 +419,10 @@ function createPanZoom(domElement, options) {
       transform.scale *= ratio;
       keepTransformInsideBounds();
     } else {
+      transform.scale *= ratio;
       var transformAdjusted = keepTransformInsideBounds();
-      if (!transformAdjusted) transform.scale *= ratio;
+      // if (!transformAdjusted) transform.scale *= ratio;
+      console.log('Transform adjusted:', transformAdjusted);
     }
 
     triggerEvent('zoom');
