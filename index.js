@@ -209,7 +209,11 @@ function createPanZoom(domElement, options) {
       storedCTMResult.x = x;
       storedCTMResult.y = y;
     }
-
+    // Mod By HoPe
+    // If there is offset on the owner object (a left menubar for example), we need to add the offset
+    storedCTMResult.x += owner.offsetLeft;
+    storedCTMResult.y += owner.offsetTop;
+	  
     return storedCTMResult;
   }
 
