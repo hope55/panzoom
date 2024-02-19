@@ -658,18 +658,18 @@ function createPanZoom(domElement, options) {
     }
 
     touchInProgress = true;
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-    document.addEventListener('touchcancel', handleTouchEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    document.addEventListener('touchcancel', handleTouchEnd, { passive: false });
   }
 
   function handleTouchMove(e) {
-    if (e.touches.length === 1) {
+    if (e.touches.length === 1 && multiTouch !== true) {
       e.stopPropagation();
       var touch = e.touches[0];
 
-      var offset = getOffsetXY(touch);
-      var point = transformToScreen(offset.x, offset.y);
+      var ownerCoords = getOffsetXY(touch);
+      var point = transformToScreen(ownerCoords.x, ownerCoords.y);
 
       var dx = point.x - mouseX;
       var dy = point.y - mouseY;
@@ -876,6 +876,7 @@ function createPanZoom(domElement, options) {
     }
   }
 
+  // Calculates from event screen event coordinates the panzoom container object (owner) event coordinates. (E.g. If there is header or sidebar, it will distract the height and width from the coordinates)  
   function getOffsetXY(e) {
     var offsetX, offsetY;
     // I tried using e.offsetX, but that gives wrong results for svg, when user clicks on a path.
