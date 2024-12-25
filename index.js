@@ -130,6 +130,9 @@ function createPanZoom(domElement, options) {
     smoothZoomAbs: smoothZoomAbs,
     showRectangle: showRectangle,
 
+    cancel: cancel,
+    // stop: stop,
+
     pause: pause,
     resume: resume,
     isPaused: isPaused,
@@ -165,6 +168,12 @@ function createPanZoom(domElement, options) {
   }
 
   return api;
+
+  function cancel() {
+    // smoothScroll.stop();
+    smoothScroll.cancel();
+    cancelZoomAnimation();
+  }
 
   function pause() {
     releaseEvents();
