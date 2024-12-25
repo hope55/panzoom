@@ -73,6 +73,7 @@ declare module "panzoom" {
     ) => void;
     getTransform: () => Transform;
     showRectangle: (rect: ClientRect) => void;
+    cancel: () => void;
     pause: () => void;
     resume: () => void;
     isPaused: () => boolean;
