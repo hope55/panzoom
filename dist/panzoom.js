@@ -131,6 +131,9 @@ function createPanZoom(domElement, options) {
     smoothZoomAbs: smoothZoomAbs,
     showRectangle: showRectangle,
 
+    cancel: cancel,
+    // stop: stop,
+
     pause: pause,
     resume: resume,
     isPaused: isPaused,
@@ -157,10 +160,21 @@ function createPanZoom(domElement, options) {
   var initialZoom = typeof options.initialZoom === 'number' ? options.initialZoom : transform.scale;
 
   if(initialX != transform.x || initialY != transform.y || initialZoom != transform.scale){
-    zoomAbs(initialX, initialY, initialZoom);
+    // Mod By HoPe: zoomAbs zooms only, does not move the view
+    //zoomAbs(initialX, initialY, initialZoom);
+    transform.x = initialX;
+    transform.y = initialY;
+    transform.scale = initialZoom;
+
   }
 
   return api;
+
+  function cancel() {
+    // smoothScroll.stop();
+    smoothScroll.cancel();
+    cancelZoomAnimation();
+  }
 
   function pause() {
     releaseEvents();
@@ -420,8 +434,10 @@ function createPanZoom(domElement, options) {
       transform.scale *= ratio;
       keepTransformInsideBounds();
     } else {
-      var transformAdjusted = keepTransformInsideBounds();
-      if (!transformAdjusted) transform.scale *= ratio;
+      transform.scale *= ratio;
+      keepTransformInsideBounds();
+      // var transformAdjusted = keepTransformInsideBounds();
+      // if (!transformAdjusted) transform.scale *= ratio;
     }
 
     triggerEvent('zoom');
@@ -652,18 +668,18 @@ function createPanZoom(domElement, options) {
     }
 
     touchInProgress = true;
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-    document.addEventListener('touchcancel', handleTouchEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    document.addEventListener('touchcancel', handleTouchEnd, { passive: false });
   }
 
   function handleTouchMove(e) {
-    if (e.touches.length === 1) {
+    if (e.touches.length === 1 && multiTouch !== true) {
       e.stopPropagation();
       var touch = e.touches[0];
 
-      var offset = getOffsetXY(touch);
-      var point = transformToScreen(offset.x, offset.y);
+      var ownerCoords = getOffsetXY(touch);
+      var point = transformToScreen(ownerCoords.x, ownerCoords.y);
 
       var dx = point.x - mouseX;
       var dy = point.y - mouseY;
@@ -870,6 +886,7 @@ function createPanZoom(domElement, options) {
     }
   }
 
+  // Calculates from event screen event coordinates the panzoom container object (owner) event coordinates. (E.g. If there is header or sidebar, it will distract the height and width from the coordinates)  
   function getOffsetXY(e) {
     var offsetX, offsetY;
     // I tried using e.offsetX, but that gives wrong results for svg, when user clicks on a path.
@@ -1327,12 +1344,12 @@ function makeSvgController(svgElement, options) {
   }
 
   function getBBox() {
-    var bbox =  svgElement.getBBox();
+    var boundingBox =  svgElement.getBBox();
     return {
-      left: bbox.x,
-      top: bbox.y,
-      width: bbox.width,
-      height: bbox.height,
+      left: boundingBox.x,
+      top: boundingBox.y,
+      width: boundingBox.width,
+      height: boundingBox.height,
     };
   }
 
